@@ -305,10 +305,9 @@ Dependencies listed in `package.json` will be installed using `npm install` or `
 ## Installation Steps
 
 1. **Clone the Repository:**
-
-   ```bash
-   git clone [https://github.com/your-username/poseidon_hash_zkp.git](https://github.com/your-username/poseidon_hash_zkp.git)
-   cd poseidon_hash_zkp
+```bash
+git clone [https://github.com/your-username/poseidon_hash_zkp.git](https://github.com/your-username/poseidon_hash_zkp.git)
+cd poseidon_hash_zkp
 
 ```
 
