@@ -1,4 +1,4 @@
-# ZKP Location Proof System
+# zerosky
 
 ![Project Demo](assets/demo.gif)
 
@@ -103,6 +103,10 @@ This system is an end-to-end solution composed of a Flutter-based mobile client 
 * **Privacy-Conscious Users:** Individuals who want their location data handled securely.
 
 # 3. Architecture
+
+## System Architecture Diagram
+
+![System Architecture Diagram](assets/system-overveiw.png)
 
 ## System Architecture Diagram
 
