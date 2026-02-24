@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JIFF MPC Client</title>
+  <script src="/dist/jiff-client.js"></script>
+  <script src="/lib/ext/jiff-client-bignumber.js"></script>
+  <script src="/lib/ext/jiff-client-fixedpoint.js"></script>
+  <script src="/lib/ext/jiff-client-negative-number.js"></script>
+</head>
+<body>
+  <h1>JIFF MPC Client</h1>
+  <p>Check the developer console for output.</p>
+
+  <script type="text/javascript">
+    // This is the MPC protocol logic.
+    // It must be identical to the one in server.js.
+    const mpcProtocol = (jiffInstance, secret) => {
+      // Wait for all parties to connect
+      jiffInstance.wait_for([1, 2], () => {
+        console.log(`Party ${jiffInstance.id} starting computation...`);
+        // Each party shares its secret.
+        const shares = jiffInstance.share(secret);
+        const client_lat_share = shares[1];
+        const server_lat_share = shares[2];
+
+        // Compute the difference
+        const diff_share = client_lat_share.ssub(server_lat_share);
+
+        console.log(`Party ${jiffInstance.id}: Starting open...`);
+
+        // Open the result
+        jiffInstance.open(diff_share).then((result) => {
+          console.log(`Party ${jiffInstance.id}: Open SUCCESS, result is ${result}`);
+          const scaling_factor = 1000000;
+          const real_result = result / scaling_factor;
+
+          console.log(`=========================================`);
+          console.log(`Result for party ${jiffInstance.id}: ${real_result}`);
+          console.log(`=========================================`);
+
+          // If this is the web-client, send result back to Flutter
+          if (jiffInstance.id === 1 && window.flutter_inappwebview) {
+            console.log(`Party ${jiffInstance.id}: Sending result to Flutter.`);
+            window.flutter_inappwebview.callHandler('mpcResult', real_result);
+          }
+
+          // console.log(`Party ${jiffInstance.id}: Disconnecting.`);
+          // jiffInstance.disconnect(true, true);
+        }).catch((error) => {
+          console.error(`Party ${jiffInstance.id}: ERROR during open!`, error);
+        });
+      });
+    };
+
+    // This function is called by the Flutter app
+    function computeLatitudeDifference(latitude) {
+      console.log("Starting MPC with latitude:", latitude);
+
+      const scaling_factor = 1000000;
+      const integer_latitude = Math.round(latitude * scaling_factor);
+
+      const options = {
+        party_id: 1,
+        party_count: 2, // All clients must specify this
+        Zp: 1000000007,
+        onError: (error) => {
+          console.error("JIFF Error:", error);
+          if (window.flutter_inappwebview) {
+            window.flutter_inappwebview.callHandler('mpcError', error.toString());
+          }
+        },
+        onConnect: (jiffInstance) => {
+          console.log("Client (Party 1) connected!");
+          mpcProtocol(jiffInstance, integer_latitude);
+        }
+      };
+
+      new JIFFClient('http://192.168.11.48:8080', 'lat-diff', options);
+    }
+  </script>
+</body>
+</html>
