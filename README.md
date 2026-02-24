@@ -104,33 +104,6 @@ Privacy-Conscious Users: Individuals who want their location data handled secure
 
 System Architecture Diagram
 
-+-------------------+           +-------------------+           +-----------------------+
-|  Mobile Client    |           |  Backend Server   |           |    Blockchain Network |
-| (Flutter App)     |           |  (Node.js/Express)|           |    (Ethereum Sepolia) |
-+-------------------+           +-------------------+           +-----------------------+
-        |                                 |                                 ^
-        | 1. Image/Location/Drone ID      |                                 |
-        |    Capture + Hash Generation    |                                 |
-        |                                 | 3. Proof Data + Tx              |
-        v                                 v                                 |
-+-------------------+             +-------------------+             +-----------------------+
-| Local Database    |             |  IPFS Gateway     |<------------|  Smart Contract       |
-| (SQLite)          |<----------->|  (Data Storage)   |             |  (ZKP Verifier)       |
-+-------------------+             +-------------------+             +-----------------------+
-        ^                                 ^                                 ^
-        |                                 | 2. ZKP Generation + IPFS Update |
-        |                                 |                                 |
-        |                             +-------------------+                 |
-        |                             |  ZKP Circuit      |                 |
-        |                             |  (Circom/snarkjs) |                 |
-        |                             +-------------------+                 |
-        |                                 ^                                 |
-        |                                 |                                 |
-        +---------------------------------+---------------------------------+
-
-
-<!-- (Note: This is a textual representation. A proper diagram would be an image.) -->
-
 Data Flow
 
 Data Acquisition (Client: lib/main.dart): The mobile client captures an image via the camera (_controller.takePicture()), acquires GPS location data (_location.onLocationChanged.listen), and detects a specific drone ID (_targetDroneId) via Bluetooth LE (FlutterBluePlus.scanResults.listen).
@@ -419,6 +392,7 @@ git clone [https://docs.github.com/en/repositories/creating-and-managing-reposit
 cd poseidon_hash_zkp/poseidon_client
 
 
+
 Client Setup:
 
 cd lib
@@ -427,10 +401,12 @@ flutter pub get
 # cd ios && pod install && cd ..
 
 
+
 Server Setup:
 
 cd server
 npm install # or yarn install
+
 
 
 ZKP Circuit Compilation and Trusted Setup (Development Only):
@@ -445,6 +421,7 @@ The ZKP circuits (e.g., circom/merkle.circom) must be compiled in advance to gen
 
 # Trusted Setup (pot19_final.ptau must be obtained separately)
 # snarkjs groth16 setup circom/merkle.r1cs pot19_final.ptau merkle_final.zkey
+
 
 
 Environment Variables
@@ -464,6 +441,7 @@ Run the following command from the project root directory to start the server:
 node server.cjs
 
 
+
 The server will start listening on https://localhost:3000. Since it uses a self-signed certificate, HTTP override settings are required on the client side (e.g., the MyHttpOverrides class in lib/main.dart).
 
 Running the Client App
@@ -471,6 +449,7 @@ Running the Client App
 Run the following command in the Flutter project root directory to deploy the app to a device or emulator:
 
 flutter run
+
 
 
 Demo Steps
@@ -482,8 +461,6 @@ Detect Drone: The app searches for a specific drone ID (_targetDroneId = D8:3A:D
 Acquire GPS: The app acquires GPS location data (Status displayed: "Acquiring GPS...").
 
 Capture Photo: Tap the shutter button at the bottom of the screen.
-<!-- Direct embedding of local videos is not supported in GitHub Markdown. Provided as a link. -->
-Video of capturing the drone: demo.mp4
 
 Performance Evaluation: The app generates hashes 30 times across multiple durations (10 to 60 seconds) and measures the average processing time. A dialog stating "Running performance evaluation..." will be displayed during this process.
 
@@ -526,6 +503,7 @@ fetch('https://localhost:3000/submit', {
 .then(res => res.json())
 .then(data => console.log(data))
 .catch(error => console.error(error));
+
 
 
 7. Evaluation / Benchmark
@@ -578,7 +556,11 @@ Comparison
 
 (This section should also be described based on comparisons with existing research or other methods.)
 
-"Compared to traditional direct data recording on the blockchain, using ZKPs reduced on-chain transaction gas fees by [N]%."
+"Compared to traditional direct data recording on the blockchain, using ZKPs reduced on-chain transaction gas fees by 
+
+$$N$$
+
+%."
 
 "In comparison to similar ZKP-based location proof systems, this system demonstrated superiority in client-side processing performance and efficient off-chain data management."
 
