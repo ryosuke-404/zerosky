@@ -1,3 +1,7 @@
+# ZKP Location Proof System
+
+![Project Demo](assets/demo.gif)
+
 # 1. Introduction
 
 ## Problem Statement
